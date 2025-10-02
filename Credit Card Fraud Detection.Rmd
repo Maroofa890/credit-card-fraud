@@ -1,0 +1,168 @@
+---
+title: "Credit Card Fraud Detection"
+author: "Maroofa Sheikh"
+date: "2025-10-01"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# 📌 Project Overview
+This project focuses on **Credit Card Fraud Detection** using machine learning in R.  
+The goal is to identify fraudulent transactions from a dataset containing anonymized credit card transaction details.
+
+---
+
+# 📊 Dataset
+- **Source:** [Kaggle Credit Card Fraud Detection Dataset](https://www.kaggle.com/mlg-ulb/creditcardfraud)  
+- **Size:** 284,807 transactions with 31 features  
+- **Target Variable:** `Class` (1 = Fraud, 0 = Normal)
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Load Libraries
+```{r}
+library(dplyr)
+library(ggplot2)
+library(caret)
+```
+
+# Load Data
+```{r}
+creditcard <- read.csv("creditcard.csv")
+```
+
+# Check dataset structure
+```{r}
+str(creditcard)
+summary(creditcard$Class)
+```
+
+# 📈 Exploratory Data Analysis (EDA)
+
+# Distribution of classes
+```{r}
+table(creditcard$Class)
+
+ggplot(creditcard, aes(x = factor(Class), fill = factor(Class))) +
+  geom_bar() +
+  labs(title = "Class Distribution", x = "Class (0 = Normal, 1 = Fraud)", y = "Count") +
+  scale_fill_manual(values = c("0" = "skyblue", "1" = "red")) +
+  theme_minimal()
+```
+
+# Summary statistics for numeric features
+```{r}
+summary(select(creditcard, -Class))
+```
+
+# Optional: Correlation heatmap for numeric features
+# Select only numeric columns
+```{r}
+numeric_vars <- select(creditcard, where(is.numeric))
+```
+
+# Compute correlation matrix
+```{r}
+cor_matrix <- cor(numeric_vars)
+```
+
+# Install ggcorrplot if not installed
+
+
+# Load plotting library
+```{r}
+library(ggcorrplot)
+```
+
+# Plot correlation heatmap
+```{r}
+ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = FALSE,
+           title = "Correlation Heatmap of Numeric Features")
+```
+
+# 🔧 Data Preprocessing
+
+# Convert target variable to factor
+```{r}
+creditcard$Class <- as.factor(creditcard$Class)
+```
+
+# Check class distribution again
+```{r}
+table(creditcard$Class)
+```
+
+# Split data into training and testing sets (70%-30%)
+```{r}
+set.seed(123)  # for reproducibility
+trainIndex <- createDataPartition(creditcard$Class, p = 0.7, list = FALSE)
+trainData <- creditcard[trainIndex, ]
+testData <- creditcard[-trainIndex, ]
+```
+
+# Confirm split
+```{r}
+table(trainData$Class)
+table(testData$Class)
+```
+
+# 🤖 Model Training - Random Forest
+```{r}
+library(randomForest)
+library(pROC)
+```
+
+# Train Random Forest model
+```{r}
+set.seed(123)
+model_rf <- randomForest(Class ~ ., data = trainData, ntree = 100)
+```
+
+# Make predictions
+```{r}
+pred_rf <- predict(model_rf, testData)
+pred_prob_rf <- predict(model_rf, testData, type = "prob")[,2]
+```
+
+# Confusion Matrix
+```{r}
+confusionMatrix(pred_rf, testData$Class, positive = "1")
+```
+
+# ROC Curve & AUC
+```{r}
+roc_rf <- roc(testData$Class, pred_prob_rf)
+plot(roc_rf, col = "blue", main = "ROC Curve - Random Forest")
+auc_value <- auc(roc_rf)
+auc_value
+```
+
+# Feature Importance
+```{r}
+varImpPlot(model_rf, main = "Feature Importance - Random Forest")
+```
+
+
+
+# 📜 Conclusion
+
+The Random Forest model was able to detect fraudulent transactions with high accuracy.  
+
+**Key insights:**
+- Fraud detection requires balancing **precision** and **recall**, as false negatives (missed frauds) are costly.  
+- The model highlights important features that contribute most to detecting fraud.
+
+**Future improvements:**
+- Apply **SMOTE oversampling** or other techniques to handle class imbalance.  
+- Compare multiple models (e.g., Logistic Regression, XGBoost, Gradient Boosting).  
+- Fine-tune hyperparameters for better performance.  
+- Deploy the model for real-time fraud detection in transaction systems.
+
