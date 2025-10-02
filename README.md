@@ -23,7 +23,7 @@ The goal is to identify fraudulent transactions from a dataset of 284,807 anonym
 
 ## View the Report
 The full project report (with plots, tables, and analysis) is available as an HTML file:  
-[file:///C:/Users/sheik/Downloads/archive%20(3)/r-data-analysis-main/Credit-Card-Fraud-Detection.html](credit_card_fraud_analysis.html)
+[Credit-Card-Fraud-Detection.html]
 
 ---
 
