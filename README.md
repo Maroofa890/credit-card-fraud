@@ -23,7 +23,7 @@ The goal is to identify fraudulent transactions from a dataset of 284,807 anonym
 
 ## View the Report
 The full project report (with plots, tables, and analysis) is available as an HTML file:  
-[VIEW](https://maroofa890.github.io/credit-card-fraud/)
+[VIEW](https://maroofa890.github.io/credit-card-fraud/Credit-Card-Fraud-Detection.html)
 
 ---
 
